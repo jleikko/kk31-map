@@ -45,7 +45,39 @@ function convertWGS84toETRSTM35FIN(lat, lon) {
 		return proj4(wgsProjection,finnProjection,[lat,lon]);
 }
 
-function resolveRoute() {
+function resolveRoute10() {
+	$.ajaxSetup( { "async": false } );
+	var eka = $.getJSON('geojson_wgs84/toka.json').responseJSON;
+	console.log(eka);
+	var convertedCoordinates =
+		eka.features[0].geometry.coordinates.map(function(point) {
+			var lat = point[0];
+			var lon = point[1];
+			var converted = convertWGS84toETRSTM35FIN(lat, lon);
+			return [converted[0], converted[1]];
+		});
+	var converted = {
+          'type': 'FeatureCollection',
+          'crs': {
+            'type': 'name',
+            'properties': {
+              'name': 'EPSG:3067'
+            }
+          },
+          'features': [
+        	{
+            	"type": "Feature",
+            	"geometry": {
+	                "type": "LineString",
+                	"coordinates": convertedCoordinates
+                }
+            }]
+        };
+    console.log(converted);
+	return converted;
+}
+
+function resolveRoute21() {
 	$.ajaxSetup( { "async": false } );
 	var eka = $.getJSON('geojson_wgs84/eka.json').responseJSON;
 	console.log(eka);
@@ -141,20 +173,46 @@ function drawRoute() {
     );
     channel.log('MapModulePlugin.AddFeaturesToMapRequest posted with data', params);
 
-    var route = resolveRoute();
+    var route10 = resolveRoute10();
+
+    var testOptions3 = {
+        'minResolution': 0,
+        'maxResolution': 1000
+    };
+    var params3 = [route10, {
+            clearPrevious: false,
+            layerOptions: testOptions3,
+            centerTo: true,
+            featureStyle: {
+                stroke : {
+                    color: 'rgba(142,196,73,1)',
+                    width: 15
+                }
+            },
+            prio: 1
+        }];
+
+
+    channel.postRequest(
+        'MapModulePlugin.AddFeaturesToMapRequest',
+        params3
+    );
+    channel.log('MapModulePlugin.AddFeaturesToMapRequest posted with data', params3);
+    
+    var route21 = resolveRoute21();
 
     var testOptions2 = {
         'minResolution': 0,
         'maxResolution': 1000
     };
-    var params2 = [route, {
+    var params2 = [route21, {
             clearPrevious: false,
             layerOptions: testOptions2,
             centerTo: true,
             featureStyle: {
                 stroke : {
                     color: '#0E683B',
-                    width: 10
+                    width: 7
                 }
             },
             prio: 1
