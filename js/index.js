@@ -163,7 +163,7 @@ function drawRoute() {
                     },
                     labelProperty: 'test_property'
                 },
-            prio: 4,
+            prio: 1,
             minScale: 1451336
         }}];
 
@@ -189,7 +189,7 @@ function drawRoute() {
                     width: 15
                 }
             },
-            prio: 1
+            prio: 3
         }];
 
 
@@ -215,7 +215,7 @@ function drawRoute() {
                     width: 7
                 }
             },
-            prio: 1
+            prio: 2
         }];
 
 
