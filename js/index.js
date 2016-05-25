@@ -45,39 +45,7 @@ function convertWGS84toETRSTM35FIN(lat, lon) {
 		return proj4(wgsProjection,finnProjection,[lat,lon]);
 }
 
-function resolveRoute10() {
-	$.ajaxSetup( { "async": false } );
-	var eka = $.getJSON('geojson_wgs84/toka.json').responseJSON;
-	console.log(eka);
-	var convertedCoordinates =
-		eka.features[0].geometry.coordinates.map(function(point) {
-			var lat = point[0];
-			var lon = point[1];
-			var converted = convertWGS84toETRSTM35FIN(lat, lon);
-			return [converted[0], converted[1]];
-		});
-	var converted = {
-          'type': 'FeatureCollection',
-          'crs': {
-            'type': 'name',
-            'properties': {
-              'name': 'EPSG:3067'
-            }
-          },
-          'features': [
-        	{
-            	"type": "Feature",
-            	"geometry": {
-	                "type": "LineString",
-                	"coordinates": convertedCoordinates
-                }
-            }]
-        };
-    console.log(converted);
-	return converted;
-}
-
-function resolveRoute21() {
+function resolveRoute() {
 	$.ajaxSetup( { "async": false } );
 	var eka = $.getJSON('geojson_wgs84/eka.json').responseJSON;
 	console.log(eka);
@@ -111,103 +79,15 @@ function resolveRoute21() {
 
 function drawRoute() {
 
-        var geojsonObject = {
-          'type': 'FeatureCollection',
-          'crs': {
-            'type': 'name',
-            'properties': {
-              'name': 'EPSG:3067'
-            }
-          },
-          'features': [
-            {
-              'type': 'Feature',
-              'geometry': {
-                'type': 'Point',
-                'coordinates': [384743.629,
-                        6681677.290]
-              },
-              'properties': {
-                'test_property': 'Start / Finish'
-              }
-
-            }
-
-          ]
-        };
+    var route = resolveRoute();
 
     var testOptions = {
         'minResolution': 0,
         'maxResolution': 1000
     };
-    var params = [geojsonObject, {
-            clearPrevious: true,
+    var params = [route, {
+            clearPrevious: false,
             layerOptions: testOptions,
-            centerTo: true,
-            featureStyle: {
-                fill: {
-                    color: '#ff0000'
-                },
-                stroke : {
-                    color: '#ff0000',
-                    width: 1
-                },
-                text : {
-                    scale : 3,
-                    fill : {
-                        color : 'rgba(142,196,73,1)'
-                    },
-                    stroke : {
-                        color : 'rgba(14,104,59,1)',
-                        width : 2
-                    },
-                    labelProperty: 'test_property'
-                },
-            prio: 1,
-            minScale: 1451336
-        }}];
-
-    channel.postRequest(
-        'MapModulePlugin.AddFeaturesToMapRequest',
-        params
-    );
-    channel.log('MapModulePlugin.AddFeaturesToMapRequest posted with data', params);
-
-    var route10 = resolveRoute10();
-
-    var testOptions3 = {
-        'minResolution': 0,
-        'maxResolution': 1000
-    };
-    var params3 = [route10, {
-            clearPrevious: false,
-            layerOptions: testOptions3,
-            centerTo: true,
-            featureStyle: {
-                stroke : {
-                    color: 'rgba(142,196,73,1)',
-                    width: 15
-                }
-            },
-            prio: 3
-        }];
-
-
-    channel.postRequest(
-        'MapModulePlugin.AddFeaturesToMapRequest',
-        params3
-    );
-    channel.log('MapModulePlugin.AddFeaturesToMapRequest posted with data', params3);
-    
-    var route21 = resolveRoute21();
-
-    var testOptions2 = {
-        'minResolution': 0,
-        'maxResolution': 1000
-    };
-    var params2 = [route21, {
-            clearPrevious: false,
-            layerOptions: testOptions2,
             centerTo: true,
             featureStyle: {
                 stroke : {
@@ -215,13 +95,13 @@ function drawRoute() {
                     width: 7
                 }
             },
-            prio: 2
+            prio: 1
         }];
 
 
     channel.postRequest(
         'MapModulePlugin.AddFeaturesToMapRequest',
-        params2
+        params
     );
     channel.log('MapModulePlugin.AddFeaturesToMapRequest posted with data', params2);
                
